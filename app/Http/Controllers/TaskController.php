@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\UserTask;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,16 +47,14 @@ class TaskController extends Controller
     
     public function share(Request $request)
     {
-        dd($request);
         $request->validate([
             'taskId' => 'required|Integer',
             'userId' => 'required|Integer',
         ]);
 
-        $task = Task::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'todolist_id' => $request->todoId,
+        $task = UserTask::create([
+            'task_id' => $request->taskId,
+            'user_id' => $request->userId,
         ]);
 
         return redirect()->back();

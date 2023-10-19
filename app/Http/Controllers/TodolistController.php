@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todolist;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -80,10 +81,12 @@ class TodolistController extends Controller
     public function getTasks(Todolist $todolist): Response
     {
         $tasks = $todolist->tasks()->with('steps')->get();
+        $sharedTasks = Auth::user()->sharedTasks()->with('steps')->get();
         
         return Inertia::render("Tasks/List", [
             'todoId' => $todolist->id,
             'tasks' => $tasks,
+            'sharedTasks' => $sharedTasks
         ]);
     }
 }

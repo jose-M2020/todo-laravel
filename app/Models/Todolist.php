@@ -15,11 +15,10 @@ class Todolist extends Model
         'name',
         'description',
         'status',
-        'limit'
     ];
 
     public function tasks()
     {
         return $this->hasMany(Task::class);
-    }
+    }    
 }

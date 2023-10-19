@@ -37,7 +37,7 @@ class StepController extends Controller
         $task = Step::create([
             'name' => $request->name,
             'description' => $request->description,
-            'task_id' => $request->todoId,
+            'task_id' => $request->taskId,
         ]);
 
         return redirect()->back();

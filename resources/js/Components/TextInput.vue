@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, toRefs } from 'vue';
 
-defineProps({
+const props = defineProps({
     modelValue: {
         type: String,
         required: true,
@@ -12,13 +12,14 @@ defineProps({
         default: 'text'
     },
 });
+const { inputType } = toRefs(props);
 
 defineEmits(['update:modelValue']);
 
 const input = ref(null);
 
 onMounted(() => {
-    if (input.value.hasAttribute('autofocus')) {
+    if (inputType === 'text' && input?.value.hasAttribute('autofocus')) {
         input.value.focus();
     }
 });
@@ -35,9 +36,11 @@ defineExpose({ focus: () => input.value.focus() });
         ref="input"
     />
     <textarea
-      v-if="inputType === 'textArea'"
+      v-else
       class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
       :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
+      ref="input"
       rows="6">
     </textarea>
 </template>

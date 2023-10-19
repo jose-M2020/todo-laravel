@@ -1,12 +1,11 @@
 <script setup>
-  import { ref, toRefs } from 'vue';
+  import { onMounted, ref, toRefs, watch } from 'vue';
   import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-  import { Head, useForm } from '@inertiajs/vue3';
+  import { Head } from '@inertiajs/vue3';
 
-  import TextInput from '@/Components/TextInput.vue';
-  import InputLabel from '@/Components/InputLabel.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import Accordion from '@/Components/Accordion.vue';
+  import CreateTaskForm from './Partials/CreateTaskForm.vue';
+  import CreateStepForm from './Partials/CreateStepForm.vue';
+  import ShareTask from './Partials/ShareTask.vue';
 
   import { getStatus } from '@/Helpers/getStatus';
 
@@ -18,49 +17,60 @@
     tasks: {
       type: Array,
       required: true,
+    },
+    sharedTasks: {
+      type: Array,
+      default: []
     }
   })
-  const { todoId } = toRefs(props);
-  const shareFormField = ref({
-    taskId: null,
-    userId: 1
-  });
+  const { tasks, sharedTasks } = toRefs(props);
+  const currentTasks = ref([]);
+  const currentTask = ref(null);
+  const currentType = ref('personal');
+  
+  const types = {
+    personal: tasks,
+    shared: sharedTasks
+  }
 
-  const taskForm = useForm({
-    name: '',
-    description: '',
-    todoId: todoId.value
-  });
+  currentTasks.value = types[currentType.value].value;
   
-  const shareTaskForm = useForm({
-    task: null,
-    userId: 1,
-  });
-  
-  const stepForm = useForm({
-    name: '',
-    description: '',
-    taskId: null
-  });
+  watch(
+    () => currentType.value,
+    () => {
+      currentTasks.value = types[currentType.value].value;
+      console.log('change')
+    }
+  )
 
-  const taskSubmit = () => {
-    taskForm.post(route('tasks.store'), {
-      onSuccess: () => taskForm.reset(),
-    });
-  };
-  
+  // Step Form Modal
 
-  const shareTaskSubmit = () => {
-    shareTaskForm.post(route('tasks.share'), {
-      onSuccess: () => shareTaskForm.reset(),
-    });
-  };
+  const isOpenStepModal = ref(false);
   
-  const stepSubmit = () => {
-    stepForm.post(route('steps.store'), {
-      onSuccess: () => form.reset(),
-    });
-  };
+  const openStepModal = (task) => {
+    currentTask.value = task;
+    isOpenStepModal.value = true;
+  }
+
+  const closeStepModal = () => {
+    isOpenStepModal.value = false;
+    // stepForm.reset();
+  }
+
+  // Share Form Modal
+
+  const isOpenShareModal = ref(false);
+  
+  const openShareModal = (task) => {
+    currentTask.value = task;
+    isOpenShareModal.value = true;
+  }
+
+  const closeShareModal = () => {
+    isOpenShareModal.value = false;
+    // stepForm.reset();
+  }
+  
 </script>
 
 <template>
@@ -72,125 +82,67 @@
     </template>
     <div class="p-4 md:p-6 lg:p-8">
       <div class="grid grid-cols-3 gap-6">
-        <div>
-          <h3 class="mb-5 font-semibold text-lg text-gray-800 leading-tight">New task</h3>
-          <form @submit.prevent="taskSubmit">
-            <div>
-                <InputLabel for="name" value="Name" />
-      
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="taskForm.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-      
-                <InputError class="mt-2" :message="taskForm.errors.name" />
-            </div>
-      
-            <div class="mt-4">
-                <InputLabel for="description" value="Descriptiom" />
-      
-                <TextInput
-                    id="description"
-                    input-type="textArea"
-                    class="mt-1 block w-full"
-                    v-model="taskForm.description"
-                    required
-                    autocomplete="description"
-                />
-      
-                <InputError class="mt-2" :message="taskForm.errors.description" />
-            </div>
-      
-            
-            <div class="flex items-center justify-end mt-4">
-                <PrimaryButton class="ml-4" :class="{ 'opacity-25': taskForm.processing }" :disabled="taskForm.processing">
-                    Create
-                </PrimaryButton>
-            </div>
-          </form>
-        </div>
+        <CreateTaskForm :todo-id="todoId" />
         <div class="col-span-2">
-          <!-- <button @click="shareTaskSubmit()">post</button> -->
-          <h3 class="mb-5 font-semibold text-lg text-gray-800 leading-tight">Added tasks</h3>
+          <div class="flex justify-between items-center gap-3">
+            <h3 class="mb-5 font-semibold text-lg text-gray-800 leading-tight">Task List</h3>
+            <div class="bg-white">
+              <nav class="flex flex-col sm:flex-row">
+                <button
+                  @click="currentType = 'personal'"
+                  class="text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none"
+                  :class="currentType === 'personal' && 'text-blue-500 border-b-2 font-medium border-blue-500'"
+                >
+                    Personal
+                </button>
+                <button
+                  @click="currentType = 'shared'"
+                  class="text-gray-600 py-4 px-6 block hover:text-blue-500 focus:outline-none"
+                  :class="currentType === 'shared' && 'text-blue-500 border-b-2 font-medium border-blue-500'"
+                >
+                    Shared
+                </button>
+              </nav>
+            </div>
+          </div>
           <div
-            v-if="tasks.length"
+            v-if="currentTasks.length"
             class="grid grid-cols-1 gap-4"
           >
             <!-- TASKS -->
             <div
-              v-for="{id, name, description, status, steps} in tasks" :key="id"
+              v-for="{id, name, description, status, steps} in currentTasks" :key="id"
             >
               <div class="p-5 bg-white shadow-lg rounded-lg">
                 <div class="pb-4 mb-4 border-b-2 border-gray-300 flex flex-col gap-2">
                   <div class="flex justify-between items-center">
-                    <p>{{ name }}</p>
-                    <div class="flex justify-center items-center gap-3">
-                      <span @click="() => { shareTaskForm.data.task = id; }">Share</span>
-                      <span>{{ getStatus(status).name }}</span>
+                    <div class="flex items-center gap-2">
+                      <p>{{ name }}</p>
+                      <span class="shadow-md p-1" :class="getStatus(status).tailwindClass">{{ getStatus(status).name }}</span>
+                    </div>
+                    <div
+                      v-if="currentType === 'personal'"
+                      class="flex justify-center items-center gap-2"
+                    >
+                      <span
+                        @click="() => { openShareModal({id, name}) }"
+                        class="rounded-full w-8 h-8 p-1 shadow-lg flex justify-center items-center hover:cursor-pointer hover:bg-gray-200 duration-200"
+                      >
+                        <i class="fa-solid fa-share-nodes"></i>
+                      </span>
+                      <span
+                        @click="openStepModal({id, name})"
+                        class="rounded-full w-8 h-8 p-1 shadow-lg flex justify-center items-center hover:cursor-pointer hover:bg-gray-200 duration-200"
+                      >
+                        <i class="fa-solid fa-plus"></i>
+                      </span>
                     </div>
                   </div>
                   <p>{{ description }}</p>
                 </div>
                 <!-- STEPS -->
                 <div>
-                  <div>
-                    <h4 class="mb-5 font-semibold text-md text-gray-800 leading-tight">New Step</h4>
-                    <form
-                      @submit.prevent="stepSubmit"
-                      class="grid grid-cols-6 gap-2 items-center justify-between"
-                    >
-                      <input
-                        id="taskId"
-                        class="mt-1 block w-full"
-                        v-value="id"
-                        v-model="stepForm.taskId"
-                        required
-                        type="hidden"
-                      />
-                      <div class="col-span-2">
-                          <InputLabel for="name" value="Name" />
-                
-                          <TextInput
-                              id="name"
-                              type="text"
-                              class="mt-1 block w-full"
-                              v-model="stepForm.name"
-                              required
-                              autofocus
-                              autocomplete="name"
-                          />
-                
-                          <InputError class="mt-2" :message="stepForm.errors.name" />
-                      </div>
-                
-                      <div class="mt-4 col-span-3">
-                          <InputLabel for="description" value="Descriptiom" />
-                
-                          <TextInput
-                              id="description"
-                              type="text"
-                              class="mt-1 block w-full"
-                              v-model="stepForm.description"
-                              required
-                              autocomplete="description"
-                          />
-                
-                          <InputError class="mt-2" :message="stepForm.errors.description" />
-                      </div>
-                
-                      
-                      <div class="col-auto flex items-center justify-end mt-4">
-                          <PrimaryButton class="ml-4" :class="{ 'opacity-25': stepForm.processing }" :disabled="stepForm.processing">
-                              Create
-                          </PrimaryButton>
-                      </div>
-                    </form>
-                  </div>
+                  <!-- LIST -->
                   <template v-if="steps.length">
                     <div v-for="{id, name, description, status} in steps" :key="id">
                       <div class="p-5 shadow-lg rounded-lg flex flex-col gap-2">
@@ -212,6 +164,15 @@
         </div>
       </div>
     </div>
+
+    <CreateStepForm
+      :show="isOpenStepModal"
+      :close="closeStepModal"
+      :taskInfo="currentTask"/>
+    <ShareTask
+      :show="isOpenShareModal"
+      :close="closeShareModal"
+      :taskInfo="currentTask"/>
   </AuthenticatedLayout>
 </template>
 

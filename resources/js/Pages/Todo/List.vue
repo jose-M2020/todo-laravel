@@ -57,11 +57,13 @@
               </div>
               <p>{{ description }}</p>
             </div>
-            <Dropdown align="right" width="48">
-              <template #trigger>
-                list
-              </template>
-            </Dropdown>
+            <!--
+              <Dropdown align="right" width="48">
+                <template #trigger>
+                  list
+                </template>
+              </Dropdown>
+              -->
           </Link>
         </div>
       </div>
