@@ -20,11 +20,16 @@
       type: Object,
       required: true,     
     },
+    todoId: {
+      type: Number,
+      required: true,     
+    },
   })
 
   const {
     close,
-    taskInfo
+    taskInfo,
+    todoId
   } = toRefs(props)
 
   // const stepForm = useForm({
@@ -36,7 +41,8 @@
   const stepForm = reactive({
     name: '',
     description: '',
-    taskId: null
+    taskId: null,
+    todoId
   })
 
   const stepSubmit = async () => {
@@ -84,7 +90,7 @@
             <InputLabel for="description" value="Description" />
             <TextInput
                 id="description"
-                type="text"
+                inputType="textarea"
                 class="mt-1 block w-full"
                 v-model="stepForm.description"
                 required

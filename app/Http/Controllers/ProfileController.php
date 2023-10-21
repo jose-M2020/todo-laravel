@@ -16,7 +16,8 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $users = User::all(['id', 'name', 'email']);
+        $loggedUserId = Auth::id();
+        $users = User::all(['id', 'name', 'email'])->except([$loggedUserId]);
         return response()->json($users);
     }
     /**

@@ -31,11 +31,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/todo', [ProfileController::class, 'getTodoList'])->name('profile.todo');
     
-    Route::post('/todo', [TodolistController::class, 'store'])->name('todo.store');
     Route::get('/todo/{todolist}/tasks', [TodolistController::class, 'getTasks'])->name('todo.tasks');
+    Route::post('/todo', [TodolistController::class, 'store'])->name('todo.store');
+    Route::delete('/todo/{todo}', [TodolistController::class, 'destroy'])->name('todo.destroy');
     
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::post('/tasks/{task}/share', [TaskController::class, 'share'])->name('tasks.share');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
     Route::post('/steps', [StepController::class, 'store'])->name('steps.store');
 });

@@ -40,7 +40,7 @@ class StepController extends Controller
             'task_id' => $request->taskId,
         ]);
 
-        return redirect()->back();
+        return to_route('todo.tasks', [ 'todolist'  => $request->todoId]);
     }
 
     /**

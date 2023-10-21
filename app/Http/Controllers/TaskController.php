@@ -32,7 +32,7 @@ class TaskController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
             'todoId' => 'required|Integer',
         ]);
 
@@ -42,9 +42,9 @@ class TaskController extends Controller
             'todolist_id' => $request->todoId,
         ]);
 
-        return redirect()->back();
+        return to_route('todo.tasks', ['todolist' => $request->todoId]);
     }
-    
+
     public function share(Request $request)
     {
         $request->validate([

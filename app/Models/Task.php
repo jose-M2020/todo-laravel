@@ -22,4 +22,9 @@ class Task extends Model
     {
         return $this->hasMany(Step::class);
     }
+
+    public function sharedUsers()
+    {
+        return $this->belongsToMany(User::class, 'user_tasks');
+    }
 }

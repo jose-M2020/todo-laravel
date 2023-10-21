@@ -15,6 +15,11 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'HOLDING': '#f7edb5',
+                'IN PROGRESS': '#a0c7da',
+                'FINISHED': '#9cfece',
+            }
         },
     },
 
