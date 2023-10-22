@@ -33,13 +33,17 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/todo/{todolist}/tasks', [TodolistController::class, 'getTasks'])->name('todo.tasks');
     Route::post('/todo', [TodolistController::class, 'store'])->name('todo.store');
+    Route::patch('/todo/{todo}', [TodolistController::class, 'update'])->name('todo.update');
     Route::delete('/todo/{todo}', [TodolistController::class, 'destroy'])->name('todo.destroy');
     
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::post('/tasks/{task}/share', [TaskController::class, 'share'])->name('tasks.share');
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     
     Route::post('/steps', [StepController::class, 'store'])->name('steps.store');
+    Route::patch('/steps/{step}', [StepController::class, 'update'])->name('steps.update');
+    Route::delete('/steps/{step}', [StepController::class, 'destroy'])->name('steps.destroy');
 });
 
 require __DIR__.'/auth.php';

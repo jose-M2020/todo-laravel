@@ -1,17 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { Link } from '@inertiajs/vue3';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import Dropdown from '@/Components/Dropdown.vue';
-import DangerButton from '@/Components/DangerButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Modal from '@/Components/Modal.vue';
-import { getStatus } from '@/Helpers/getStatus';
+import DeleteModal from '@/Components/DeleteModal.vue';
 
 import StepList from './StepList.vue';
 import ShareTask from './ShareTask.vue';
-import CreateStepForm from './CreateStepForm.vue';
+import StepForm from './StepForm.vue';
+import TaskForm from './TaskForm.vue';
+import { getStatus } from '@/Helpers/getStatus';
 
 const props = defineProps({
   tasks: {
@@ -25,11 +24,11 @@ const props = defineProps({
     type: Number,
     required: true
   },
-})
+});
 
-const currentTask = ref({});
 const selectedTask = ref({});
 const currentSteps = ref([]);
+const clickedTask = ref({});
 
 const setSteps = () => {
   currentSteps.value = props.tasks.find(task => (
@@ -53,7 +52,7 @@ const selectTask = task => selectedTask.value = task;
 const isOpenStepModal = ref(false);
 
 const openStepModal = (task) => {
-  currentTask.value = task;
+  clickedTask.value = task;
   isOpenStepModal.value = true;
 }
 
@@ -67,7 +66,7 @@ const closeStepModal = () => {
 const isOpenShareModal = ref(false);
 
 const openShareModal = (task) => {
-  currentTask.value = task;
+  clickedTask.value = task;
   isOpenShareModal.value = true;
 }
 
@@ -76,9 +75,20 @@ const closeShareModal = () => {
   // stepForm.reset();
 }
 
-// Task Form Modal
+// Delete Task Modal
 const isOpenTaskDeleteModal = ref(false);
-const toggleTaskDeleteModal = () => isOpenTaskDeleteModal.value = !isOpenTaskDeleteModal.value;
+const toggleTaskDeleteModal = (task = {}) => {
+  clickedTask.value = task;
+  isOpenTaskDeleteModal.value = !isOpenTaskDeleteModal.value
+};
+
+// Edit Task Modal
+
+const isOpenEditModal = ref(false);
+const toggleEditModal = (task = {}) => {
+  clickedTask.value = task;
+  isOpenEditModal.value = !isOpenEditModal.value
+};
 
 </script>
 
@@ -92,77 +102,84 @@ const toggleTaskDeleteModal = () => isOpenTaskDeleteModal.value = !isOpenTaskDel
         <div
           v-for="{id, name, description, status, shared_users} in tasks"
           :key="id"
-          class="p-5 bg-white shadow-lg rounded-lg"
+          class="flex items-center"
         >
-          <div class="pb-4 mb-4 border-b-2 border-gray-200 flex flex-col gap-2">
-            <!-- HEADER -->
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <p>{{ name }}</p>
-                <span
-                  class="p-[7px] rounded-lg text-sm bg-indigo-100 text-indigo-700"
-                >
-                  {{ getStatus(status).name }}
-                </span>
-              </div>
-
-              <div
-                v-if="currentType === 'personal'"
-                class="flex justify-center items-center gap-2"
-              >
-                <div class="flex items-center">
-                  <span>{{ shared_users?.length }}</span>
+          <div
+            class="flex-grow p-5 bg-white shadow-lg rounded-lg"
+            :class="{ 'bg-cyan-800/10': selectedTask.id === id }"  
+          >
+            <div class="pb-4 mb-4 border-b-2 border-gray-200 flex flex-col gap-2">
+              <!-- HEADER -->
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <p>{{ name }}</p>
                   <span
-                    class="rounded-full p-1 shadow-lg flex justify-center items-center"
+                    class="p-[7px] rounded-lg text-sm bg-indigo-100 text-indigo-700"
                   >
-                    <i class="fa-solid fa-user"></i>
+                    {{ getStatus(status).name }}
                   </span>
                 </div>
-                
-                <!-- Dropdown OPTIONS -->
-                <div class="relative">
-                  <Dropdown align="right" width="48">
-                      <template #trigger>
-                          <span class="inline-flex rounded-md">
-                              <button
-                                type="button"
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-full text-gray-500 bg-white hover:text-gray-700 hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150"
-                              >
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                              </button>
-                          </span>
-                      </template>
-
-                      <template #content>
-                          <DropdownLink
-                            @click="openStepModal({id, name})"
-                          >
-                          <i class="fa-solid fa-plus me-2"></i>Add step
-                          </DropdownLink>
-                          <DropdownLink
-                            @click="openShareModal({id, name})"
-                          >
-                            <i class="fa-solid fa-share-nodes me-2"></i>Share
-                          </DropdownLink>
-                          <DropdownLink
-                            @click="toggleTaskDeleteModal"
-                          >
-                          <i class="fa-solid fa-trash me-2"></i>Delete
-                          </DropdownLink>
-                      </template>
-                  </Dropdown>
+  
+                <div
+                  v-if="currentType === 'personal'"
+                  class="flex justify-center items-center gap-2"
+                >
+                  <div class="flex items-center">
+                    <span>{{ shared_users?.length }}</span>
+                    <span
+                      class="rounded-full p-1 shadow-lg flex justify-center items-center"
+                    >
+                      <i class="fa-solid fa-user"></i>
+                    </span>
+                  </div>
+                  
+                  <!-- Dropdown OPTIONS -->
+                  <div class="relative">
+                    <Dropdown align="right" width="48">
+                        <template #trigger>
+                            <span class="inline-flex rounded-md">
+                                <button
+                                  type="button"
+                                  class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-full text-gray-500 bg-white hover:text-gray-700 hover:bg-gray-200 focus:outline-none transition ease-in-out duration-150"
+                                >
+                                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                            </span>
+                        </template>
+  
+                        <template #content>
+                            <DropdownLink @click="openStepModal({id, name})" >
+                              <i class="fa-solid fa-plus me-2"></i>Add step
+                            </DropdownLink>
+                            <DropdownLink 
+                              @click="toggleEditModal({
+                                id, name, description, status,
+                              })"
+                            >
+                              <i class="fa-solid fa-edit me-2"></i>Edit
+                            </DropdownLink>
+                            <DropdownLink @click="openShareModal({id, name})" >
+                              <i class="fa-solid fa-share-nodes me-2"></i>Share
+                            </DropdownLink>
+                            <DropdownLink @click="toggleTaskDeleteModal({id, name})" >
+                              <i class="fa-solid fa-trash me-2"></i>Delete
+                            </DropdownLink>
+                        </template>
+                    </Dropdown>
+                  </div>
                 </div>
               </div>
+              <p>{{ description }}</p>
             </div>
-            <p>{{ description }}</p>
+            <div class="flex justify-end">
+              <PrimaryButton
+                @click="selectTask({id, name})"
+              >
+                Show steps
+              </PrimaryButton>
+            </div>
           </div>
-          <div class="flex justify-end">
-            <PrimaryButton
-              @click="selectTask({id, name})"
-            >
-              Show steps
-            </PrimaryButton>
-          </div>              
+          <!-- <i class="fa-solid fa-play text-white text-3xl"></i>             -->
         </div>
       </div>
       <div>
@@ -170,44 +187,39 @@ const toggleTaskDeleteModal = () => isOpenTaskDeleteModal.value = !isOpenTaskDel
       </div>
     </div>
 
-    <Modal :show="isOpenTaskDeleteModal" @close="toggleTaskDeleteModal">
-      <div class="p-6">
-          <h2 class="text-lg font-medium text-gray-900">
-              Are you sure you want to delete the task?
-          </h2>
-  
-          <p class="mt-1 text-sm text-gray-600">
-              Once your task is deleted, all of its resources and data will be permanently deleted.
-          </p>
-  
-          <div class="mt-6 flex justify-end">
-              <SecondaryButton @click="toggleTaskDeleteModal"> Cancel </SecondaryButton>
-  
-              <DangerButton
-                  class="ml-3"
-              >
-                  <Link
-                    :href="route('tasks.destroy', { task: 111 })"
-                    method="delete"
-                    as="button"
-                  >Delete
-                  </Link>
-                              
-                  Delete Task
-              </DangerButton>
-          </div>
-      </div>
+    <Modal :show="isOpenEditModal" @close="toggleEditModal">
+      <TaskForm
+        action="edit"
+        :id="clickedTask.id"
+        :name="clickedTask.name"
+        :description="clickedTask.description"
+        :status="clickedTask.status"
+        @updated="toggleEditModal"
+      />
     </Modal>
-  
-    <CreateStepForm
-      :show="isOpenStepModal"
-      :close="closeStepModal"
-      :taskInfo="currentTask"
-      :todoId="todoId"/>
+    
+    <Modal :show="isOpenStepModal" @close="closeStepModal">
+      <h4 class="mb-5 font-semibold text-md text-gray-800 leading-tight">New Step</h4>
+      <StepForm
+        :task-id="clickedTask?.id"
+        :todo-id="todoId"
+        action="store"
+        @created="closeStepModal"
+      />
+    </Modal>
+    
+    <DeleteModal
+      title="Are you sure you want to delete the task?"
+      description="Once your task is deleted, all of its resources and data will be permanently deleted."
+      :deleteRoute="['tasks.destroy', clickedTask.id]"
+      :show="isOpenTaskDeleteModal"
+      @close="toggleTaskDeleteModal"
+    />
+    
     <ShareTask
       :show="isOpenShareModal"
       :close="closeShareModal"
-      :taskInfo="currentTask"/>
+      :taskInfo="clickedTask"/>
   </template>
 
 </template>

@@ -1,68 +1,68 @@
 <script setup>
-  import { ref, toRefs, watch } from 'vue';
-  import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-  import { Head } from '@inertiajs/vue3';
+import { ref, toRefs, watch } from 'vue';
+import { Head } from '@inertiajs/vue3';
 
-  import Modal from '@/Components/Modal.vue';
-  import PrimaryButton from '@/Components/PrimaryButton.vue';
-  import CreateTaskForm from './Partials/CreateTaskForm.vue';
-  import TaskList from './Partials/TaskList.vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Modal from '@/Components/Modal.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import TaskForm from './Partials/TaskForm.vue';
+import TaskList from './Partials/TaskList.vue';
 
-  const props = defineProps({
-    todoId: {
-      type: Number,
-      required: true,
-    },
-    tasks: {
-      type: Array,
-      required: true,
-    },
-    sharedTasks: {
-      type: Array,
-      default: []
-    }
-  })
-
-  const { tasks, sharedTasks } = toRefs(props);
-  const currentTasks = ref([]);
-  const currentTaskType = ref('personal');
-  
-  const isOpenTaskModal = ref(false);
-
-  const types = {
-    personal: tasks,
-    shared: sharedTasks
+const props = defineProps({
+  todoId: {
+    type: Number,
+    required: true,
+  },
+  tasks: {
+    type: Array,
+    required: true,
+  },
+  sharedTasks: {
+    type: Array,
+    default: []
   }
+})
 
-  watch(
-    () => props.tasks,
-    () => { 
-      currentTasks.value = types[currentTaskType.value].value
-      isOpenTaskModal.value = false;
-    },
-    { immediate: true }
-  );
+const { tasks, sharedTasks } = toRefs(props);
+const currentTasks = ref([]);
+const currentTaskType = ref('personal');
 
-  watch(
-    () => currentTaskType.value,
-    () => {
-      currentTasks.value = types[currentTaskType.value].value;
-    }
-  )
+const isOpenTaskModal = ref(false);
 
-  const setTaskType = type => {
-    currentTaskType.value = type;
-    // currentSteps.value = [];
+const types = {
+  personal: tasks,
+  shared: sharedTasks
+}
+
+watch(
+  () => props.tasks,
+  () => { 
+    currentTasks.value = types[currentTaskType.value].value
+    isOpenTaskModal.value = false;
+  },
+  { immediate: true }
+);
+
+watch(
+  () => currentTaskType.value,
+  () => {
+    currentTasks.value = types[currentTaskType.value].value;
   }
+)
 
-  // Task Form Modal
-  
-  const toggleTaskModal = () => isOpenTaskModal.value = !isOpenTaskModal.value;
+const setTaskType = type => {
+  currentTaskType.value = type;
+  // currentSteps.value = [];
+}
+
+// Task Form Modal
+
+const toggleTaskModal = () => isOpenTaskModal.value = !isOpenTaskModal.value;
 
 </script>
 
 <template>
-  <Head title="Todo" />
+  <Head title="Tasks" />
 
   <AuthenticatedLayout>
     <template #header>
@@ -112,7 +112,7 @@
           </div>
           <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
             <h3 class="text-xl font-bold text-center mb-6">Create new task</h3>
-            <CreateTaskForm :todo-id="todoId" />
+            <TaskForm action="store" />
           </div>
       </div>
       <template v-else>
@@ -121,7 +121,7 @@
           @close="toggleTaskModal"
         >
           <h3 class="text-xl font-bold text-center mb-6">Create new task</h3>
-          <CreateTaskForm :todo-id="todoId" />
+          <TaskForm action="store" />
         </Modal>
       </template>
     </div>

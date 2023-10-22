@@ -37,7 +37,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
   >
-    <div class="absolute bottom-[15px] right-[15px]">
+    <div class="fixed bottom-[15px] right-[15px]">
         <div id="toast-danger" class="flex items-center w-full max-w-xs min-w-[300px] p-4 text-slate-800 bg-slate-100 shadow-xl rounded-lg" role="alert">
           
           <div v-if="type === 'error'" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-300 bg-red-700 rounded-lg">

@@ -4,7 +4,7 @@
   import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
   import TodoCard from './Partials/TodoCard.vue';
-  import CreateTodoForm from './Partials/CreateTodoForm.vue';
+  import TodoForm from './Partials/TodoForm.vue';
 
   const props = defineProps({
     todoList: {
@@ -19,7 +19,7 @@
 </script>
 
 <template>
-  <Head title="Todo" />
+  <Head title="List" />
   <AuthenticatedLayout>
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">Todo List</h2>
@@ -52,7 +52,7 @@
           </div>
           <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
             <h3 class="text-xl font-bold text-center mb-6">Create your first todo list</h3>
-            <CreateTodoForm />
+            <TodoForm action="store" />
           </div>
       </div>
     </div>

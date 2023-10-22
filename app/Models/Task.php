@@ -10,7 +10,6 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
         'name',
         'description',
         'status',
@@ -20,7 +19,7 @@ class Task extends Model
 
     public function steps()
     {
-        return $this->hasMany(Step::class);
+        return $this->hasMany(Step::class)->orderByDesc('created_at');
     }
 
     public function sharedUsers()

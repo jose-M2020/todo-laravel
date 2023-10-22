@@ -1,7 +1,7 @@
 
 <script setup>
   import { router } from "@inertiajs/vue3";
-  import { onMounted, reactive, ref, toRefs } from "vue";
+  import { reactive, ref, toRefs } from "vue";
   import axios from "axios";
   
   import Modal from '@/Components/Modal.vue';
@@ -44,11 +44,15 @@
   };
 
   const searchUser = async () => {
-    loading.value = true;
-    const { data } = await axios.get(route('users.index'))
-    users.value = data;
-    
-    loading.value = false;
+    try {
+      loading.value = true;
+      const { data } = await axios.get(route('users.index'))
+      users.value = data;
+      
+      loading.value = false;
+    } catch (error) {
+      console.log(error)      
+    }
   }
 </script>
 

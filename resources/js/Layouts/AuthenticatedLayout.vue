@@ -2,7 +2,6 @@
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
-
 import Toast from '@/Components/Toast.vue';
 import Navbar from './Partials/Navbar.vue';
 

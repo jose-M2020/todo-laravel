@@ -4,31 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\UserTask;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -45,7 +31,7 @@ class TaskController extends Controller
         return to_route('todo.tasks', ['todolist' => $request->todoId]);
     }
 
-    public function share(Request $request)
+    public function share(Request $request): RedirectResponse
     {
         $request->validate([
             'taskId' => 'required|Integer',
@@ -59,36 +45,42 @@ class TaskController extends Controller
 
         return redirect()->back();
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
+    
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Task $task): RedirectResponse
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'status' => 'required|string|max:255',
+        ]);
+
+        $task->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'status' => $request->status,
+        ]);
+
+        return to_route('todo.tasks', $task->todolist_id)->with('message', [
+            'type' => 'success',
+            'text' => 'Updated successfully!'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Task $task): RedirectResponse
     {
-        //
+        // TODO: search why does UserTask items cannot be deleted, even if has onDelete('cascade')
+        UserTask::where('task_id', $task->id)->delete();
+        $task->delete();
+
+        return to_route('todo.tasks', $task->todolist_id)->with('message', [
+            'type' => 'success',
+            'text' => 'Deleted'
+        ]);
     }
 }
