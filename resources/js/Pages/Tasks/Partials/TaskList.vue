@@ -80,6 +80,7 @@ const isOpenTaskDeleteModal = ref(false);
 const toggleTaskDeleteModal = (task = {}) => {
   clickedTask.value = task;
   isOpenTaskDeleteModal.value = !isOpenTaskDeleteModal.value
+  console.log('deleted',{isOpenTaskDeleteModal:  isOpenTaskDeleteModal.value})
 };
 
 // Edit Task Modal
@@ -105,8 +106,8 @@ const toggleEditModal = (task = {}) => {
           class="flex items-center"
         >
           <div
-            class="flex-grow p-5 bg-white shadow-lg rounded-lg"
-            :class="{ 'bg-cyan-800/10': selectedTask.id === id }"  
+            class="flex-grow p-5 shadow-lg rounded-lg"
+            :class="selectedTask.id === id ? 'bg-cyan-800/10' : 'bg-white'"  
           >
             <div class="pb-4 mb-4 border-b-2 border-gray-200 flex flex-col gap-2">
               <!-- HEADER -->

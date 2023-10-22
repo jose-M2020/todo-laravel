@@ -5,6 +5,8 @@ import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Select from "@/Components/Select.vue";
+import { getStatus } from "@/Helpers/getStatus";
 
 const props = defineProps({
   id: {
@@ -69,6 +71,17 @@ const submit = () => {
                 autocomplete="name"
             />
             <InputError class="mt-2" :message="form.errors.name" />
+        </div>
+        <div>
+            <InputLabel for="status" value="Status" />
+            <Select
+              v-model="form.status"
+              class="mt-1 block w-full"
+              :options="getStatus()"
+              :defaultValue="status"
+              required
+            />
+            <InputError class="mt-2" :message="form.errors.status" />
         </div>
         <div class="mt-4">
             <InputLabel for="description" value="Descriptiom" />

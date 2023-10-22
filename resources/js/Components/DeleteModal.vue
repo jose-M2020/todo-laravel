@@ -40,7 +40,8 @@ const emit = defineEmits(['close']);
 const isLoading = ref(false);
 
 const close = () => {
-    emit('close');
+  emit('close');
+  console.log('closing...');
 };
 
 const deleteItem = () => {
@@ -49,7 +50,7 @@ const deleteItem = () => {
   router.delete(route(...props.deleteRoute), {
     onSuccess: () => { 
       isLoading.value = false;
-      close()
+      close();
     },
     onError: (error) => {
       console.log(error);

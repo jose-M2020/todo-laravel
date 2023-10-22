@@ -23,32 +23,29 @@ const props = defineProps({
   }
 })
 
-const { tasks, sharedTasks } = toRefs(props);
 const currentTasks = ref([]);
 const currentTaskType = ref('personal');
 
 const isOpenTaskModal = ref(false);
 
-const types = {
-  personal: tasks,
-  shared: sharedTasks
-}
+// const types = {
+//   personal: props.tasks,
+//   shared: props.sharedTasks
+// }
 
+// FIXME: delete task modal is showed after last deleted task and create new one
 watch(
-  () => props.tasks,
-  () => { 
-    currentTasks.value = types[currentTaskType.value].value
-    isOpenTaskModal.value = false;
+  () => [props.tasks, currentTaskType.value],
+  () => {
+
+    currentTasks.value = currentTaskType.value === 'personal' ? (
+      props.tasks
+    ) : (
+      props.sharedTasks
+    );
   },
   { immediate: true }
 );
-
-watch(
-  () => currentTaskType.value,
-  () => {
-    currentTasks.value = types[currentTaskType.value].value;
-  }
-)
 
 const setTaskType = type => {
   currentTaskType.value = type;
@@ -101,7 +98,7 @@ const toggleTaskModal = () => isOpenTaskModal.value = !isOpenTaskModal.value;
 
       <!-- TASK FORM -->
       <div
-        v-if="currentTasks.length === 0 && currentTaskType === 'personal'"
+        v-if="currentTasks?.length === 0 && currentTaskType === 'personal'"
         class="flex justify-center items-center gap-7"
       >
           <div>
@@ -121,7 +118,10 @@ const toggleTaskModal = () => isOpenTaskModal.value = !isOpenTaskModal.value;
           @close="toggleTaskModal"
         >
           <h3 class="text-xl font-bold text-center mb-6">Create new task</h3>
-          <TaskForm action="store" />
+          <TaskForm
+            action="store"
+            @created="toggleTaskModal"
+          />
         </Modal>
       </template>
     </div>

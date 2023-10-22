@@ -1,6 +1,6 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
-import { ref, toRefs } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 
 import { useTodoStore } from '@/Stores/TodoStore';
 import Dropdown from '@/Components/Dropdown.vue';
@@ -31,14 +31,16 @@ const props = defineProps({
 
 const todoStore = useTodoStore()
 
-const { status } = toRefs(props);
+const statusProps = ref();
 const clickedTodo = ref();
 
-const {
-  name: nameStatus,
-  tailwindClass,
-} = getStatus(status.value);
-
+watch(
+  () => props.status,
+  () => {
+    statusProps.value = getStatus(props.status);
+  },
+  { immediate: true }
+)
 
 const redirectTask = todo => {
   todoStore.setCurrentTodo(todo);
@@ -71,9 +73,9 @@ const toggleEditModal = (todo = {}) => {
           <p>{{ name }}</p>
           <span
             class="p-[7px] rounded-lg text-sm bg-indigo-100 text-indigo-700"
-            :class="`bg-${status}`"
+            :class="`bg-${statusProps?.name}`"
           >
-            {{ nameStatus }}
+            {{ statusProps?.name }}
           </span>
         </div>
         <div>

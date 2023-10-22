@@ -1,3 +1,4 @@
+
 export const getStatus = (statusName) => {
   const colors = {
     danger: {
@@ -13,21 +14,24 @@ export const getStatus = (statusName) => {
       textColor: '#2bb973'
     },
   }
-
+  
   const status = {
     'HOLDING': {
+      id: 'HOLDING',
       name: 'Holding',
       bgColor: colors.danger.bgColor,
       textColor: colors.danger.textColor,
       tailwindClass: `bg-[${colors.danger.bgColor}] text-[${colors.danger.textColor}]`
     },
     'IN PROGRESS': {
+      id: 'IN PROGRESS',
       name: 'In Progress',
       bgColor: colors.info.bgColor,
       textColor: colors.info.textColor,
       tailwindClass: `bg-[${colors.info.bgColor}] text-[${colors.info.textColor}]`
     },
     'FINISHED': {
+      id: 'FINISHED',
       name: 'Finished',
       bgColor: colors.success.bgColor,
       textColor: colors.success.textColor,
@@ -35,5 +39,5 @@ export const getStatus = (statusName) => {
     },
   };
 
-  return status ? status[statusName] : status;
+  return statusName ? status[statusName] : Object.values(status);
 }
